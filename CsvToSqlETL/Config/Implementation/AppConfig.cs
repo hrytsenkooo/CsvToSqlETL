@@ -8,7 +8,8 @@ namespace CsvToSqlETL.Config.Implementation
         public string CsvPath { get; }
         public string DbConnectionString { get; }
         public string DuplicatesCsvPath { get; }
-        
+        public int BatchSize { get; }
+
         public AppConfig()
         {
             try
@@ -18,6 +19,12 @@ namespace CsvToSqlETL.Config.Implementation
                 CsvPath = GetRequiredEnvVariable("CSV_PATH");
                 DbConnectionString = GetRequiredEnvVariable("DB_CONNECTION_STRING");
                 DuplicatesCsvPath = GetEnvVariableOrDefault("DUPLICATES_CSV_PATH", "duplicates.csv");
+
+                if (!int.TryParse(Environment.GetEnvironmentVariable("BATCH_SIZE"), out int batchSize))
+                {
+                    batchSize = 1000;
+                }
+                BatchSize = batchSize;
             }
             catch (Exception ex)
             {

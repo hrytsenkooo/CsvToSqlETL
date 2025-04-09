@@ -4,6 +4,7 @@
     {
         string CsvPath { get; }
         string DbConnectionString { get; }
-        string DuplicatesCsvPath { get; }    
+        string DuplicatesCsvPath { get; }
+        int BatchSize { get; }
     }
 }
