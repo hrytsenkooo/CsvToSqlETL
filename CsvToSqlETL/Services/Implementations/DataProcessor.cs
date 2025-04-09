@@ -19,7 +19,7 @@ namespace CsvToSqlETL.Services.Implementations
         {
             _logger.LogInformation("Processing records");
 
-            var uniqueRecords = new Dictionary<(DateTime, DateTime, int), TripRecord>();
+            var uniqueRecords = new Dictionary<(DateTime, DateTime, int?), TripRecord>();
             var duplicates = new List<TripRecord>();
             var recordCount = 0;
 

@@ -2,6 +2,7 @@
 using CsvToSqlETL.Config.Interface;
 using CsvToSqlETL.Models;
 using CsvToSqlETL.Services.Interfaces;
+using CsvToSqlETL.Validators;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
 
@@ -53,6 +54,12 @@ namespace CsvToSqlETL.Services.Implementations
                         "N" => "No",
                         _ => record.StoreAndFwdFlag?.Trim() ?? string.Empty
                     };
+
+                    if (!TripRecordValidator.TryValidate(ref record, out var validationError))
+                    {
+                        _logger.LogWarning($"Invalid record at row {csv.Context.Parser.Row}: {validationError}");
+                        continue;
+                    }
                 }
                 catch (Exception ex)
                 {

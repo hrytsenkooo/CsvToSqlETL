@@ -11,7 +11,7 @@ namespace CsvToSqlETL.Models
         public DateTime DropoffDatetime { get; set; }
 
         [Name("passenger_count")]
-        public int PassengerCount { get; set; }
+        public int? PassengerCount { get; set; }
 
         [Name("trip_distance")]
         public double TripDistance { get; set; }
