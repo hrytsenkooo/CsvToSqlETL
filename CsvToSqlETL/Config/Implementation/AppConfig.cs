@@ -1,5 +1,5 @@
 ﻿using CsvToSqlETL.Config.Interface;
-using DotNetEnv;
+using Microsoft.Extensions.Configuration;
 
 namespace CsvToSqlETL.Config.Implementation
 {
@@ -10,21 +10,14 @@ namespace CsvToSqlETL.Config.Implementation
         public string DuplicatesCsvPath { get; }
         public int BatchSize { get; }
 
-        public AppConfig()
+        public AppConfig(IConfiguration configuration)
         {
             try
-            {
-                Env.Load();
-
-                CsvPath = GetRequiredEnvVariable("CSV_PATH");
-                DbConnectionString = GetRequiredEnvVariable("DB_CONNECTION_STRING");
-                DuplicatesCsvPath = GetEnvVariableOrDefault("DUPLICATES_CSV_PATH", "duplicates.csv");
-
-                if (!int.TryParse(Environment.GetEnvironmentVariable("BATCH_SIZE"), out int batchSize))
-                {
-                    batchSize = 1000;
-                }
-                BatchSize = batchSize;
+            { 
+                CsvPath = GetRequired(configuration, "CSV_PATH");
+                DbConnectionString = GetRequired(configuration, "DB_CONNECTION_STRING");
+                DuplicatesCsvPath = GetValueOrDefault(configuration, "DUPLICATES_CSV_PATH", "duplicates.csv");
+                BatchSize = GetValueOrDefault(configuration, "BATCH_SIZE", 1000);
             }
             catch (Exception ex)
             {
@@ -32,21 +25,26 @@ namespace CsvToSqlETL.Config.Implementation
             }
         }
 
-        private string GetRequiredEnvVariable(string name)
+        private string GetRequired(IConfiguration configuration, string key)
         { 
-            string value = Environment.GetEnvironmentVariable(name);
+            string value = configuration[key] ?? Environment.GetEnvironmentVariable(key);
             if (string.IsNullOrWhiteSpace(value))
             {
-                throw new ArgumentException($"Missing required environment variable: {name}");
+                throw new ArgumentException($"Missing required configuration value: {key}");
             }
-
             return value;
         }
 
-        private string GetEnvVariableOrDefault(string name, string defaultValue)
+        private string GetValueOrDefault(IConfiguration configuration, string key, string defaultValue)
         {
-            string value = Environment.GetEnvironmentVariable(name);
+            string value = configuration[key] ?? Environment.GetEnvironmentVariable(key);
             return string.IsNullOrWhiteSpace(value) ? defaultValue : value;
+        }
+
+        private int GetValueOrDefault(IConfiguration configuration, string key, int defaultValue)
+        {
+            string value = configuration[key] ?? Environment.GetEnvironmentVariable(key);
+            return int.TryParse(value, out int result) ? result : defaultValue;
         }
     }
 }

@@ -2,9 +2,11 @@
 using CsvToSqlETL.Config.Interface;
 using CsvToSqlETL.Services.Implementations;
 using CsvToSqlETL.Services.Interfaces;
-using DotNetEnv;
+using DotNetEnv.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace CsvToSqlETL
 {
@@ -12,7 +14,6 @@ namespace CsvToSqlETL
     {
         static async Task Main(string[] args)
         {
-
             var serviceProvider = ConfigureServices();
 
             try
@@ -36,17 +37,32 @@ namespace CsvToSqlETL
 
         private static ServiceProvider ConfigureServices()
         {
+            if (File.Exists(".env"))
+            {
+                DotNetEnv.Env.Load(".env");
+                Console.WriteLine(".env file loaded successfully");
+            }
+            else
+            {
+                Console.WriteLine(".env file not found in: " + Path.GetFullPath("."));
+            }
+
+            IConfiguration configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .AddDotNetEnv() 
+                .Build();
+
             var services = new ServiceCollection();
-
+            services.AddSingleton(configuration);
+            services.Configure<AppConfig>(configuration);
             services.AddSingleton<IAppConfig, AppConfig>();
-
             services.AddTransient<ICsvReader, CsvReader>();
             services.AddTransient<IDatabaseService, DatabaseService>();
             services.AddTransient<IDataProcessor, DataProcessor>();
             services.AddTransient<IEtlService, EtlService>();
-
             services.AddLogging(configure => configure.AddConsole());
-
             return services.BuildServiceProvider();
         }
     }
