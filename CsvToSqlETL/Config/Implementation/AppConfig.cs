@@ -33,7 +33,7 @@ namespace CsvToSqlETL.Config.Implementation
         }
 
         private string GetRequiredEnvVariable(string name)
-        {
+        { 
             string value = Environment.GetEnvironmentVariable(name);
             if (string.IsNullOrWhiteSpace(value))
             {
