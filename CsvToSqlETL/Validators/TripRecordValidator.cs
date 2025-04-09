@@ -4,6 +4,14 @@ namespace CsvToSqlETL.Validators
 {
     public static class TripRecordValidator
     {
+        /// <summary>
+        /// Validates a TripRecord object against a set of business rules and data quality checks.
+        /// Trims certain fields, checks for required values, ensures numerical values are within expected ranges,
+        /// and verifies logical consistency (e.g., pickup time before dropoff).
+        /// </summary>
+        /// <param name="record">The trip record to validate. May be modified during validation</param>
+        /// <param name="error">If validation fails, contains the reason for the failure</param>
+        /// <returns>True if the record is valid; otherwise, false with an error message</returns>
         public static bool TryValidate(ref TripRecord record, out string error)
         {
             error = string.Empty;

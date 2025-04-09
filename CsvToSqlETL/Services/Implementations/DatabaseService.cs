@@ -13,12 +13,23 @@ namespace CsvToSqlETL.Services.Implementations
         private readonly ILogger<DatabaseService> _logger;
         private const string TableName = "TaxiTrips";
 
+        /// <summary>
+        /// Initializes a new instance of the DatabaseService class with the specified configuration and logger
+        /// </summary>
+        /// <param name="config">Application configuration containing database connection settings</param>
+        /// <param name="logger">Logger for diagnostic information</param>
         public DatabaseService(IAppConfig config, ILogger<DatabaseService> logger)
         {
             _config = config;
             _logger = logger;
         }
 
+        /// <summary>
+        /// Performs a bulk insert of trip records into the database using SqlBulkCopy
+        /// for optimal performance. Converts EST datetimes to UTC before insertion.
+        /// </summary>
+        /// <param name="records">Collection of trip records to insert into the database</param>
+        /// <returns>A task representing the asynchronous bulk insert operation</returns>
         public async Task BulkInsertAsync(IEnumerable<TripRecord> records)
         {
             if (!records.Any())
@@ -78,6 +89,14 @@ namespace CsvToSqlETL.Services.Implementations
             _logger.LogInformation("Bulk insert completed");
         }
 
+        /// <summary>
+        /// Creates the database schema if it doesn't already exist. This includes the TaxiTrips table
+        /// and indexes optimized for specific query patterns:
+        /// - IX_TaxiTrips_PULocationID: for queries filtering by pickup location
+        /// - IX_TaxiTrips_TripDistance: for finding top longest trips by distance
+        /// - IX_TaxiTrips_TravelTime: for finding top longest trips by travel time
+        /// </summary>
+        /// <returns>A task representing the asynchronous schema creation operation</returns>
         public async Task CreateSchemaIfNotExistsAsync()
         {
             _logger.LogInformation("Ensuring database schema exists");
@@ -113,6 +132,10 @@ namespace CsvToSqlETL.Services.Implementations
             _logger.LogInformation("Database schema verified");
         }
 
+        /// <summary>
+        /// Retrieves the total number of rows in the TaxiTrips table
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation, with the result being the row count</returns>
         public async Task<int> GetRowCountAsync()
         {
             using var connection = new SqlConnection(_config.DbConnectionString);

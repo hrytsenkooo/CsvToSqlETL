@@ -11,6 +11,13 @@ namespace CsvToSqlETL.Services.Implementations
         private readonly IDatabaseService _databaseService;
         private readonly ILogger<EtlService> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the EtlService class with the specified data processor, CSV reader, database service, and logger
+        /// </summary>
+        /// <param name="dataProcessor">Service responsible for filtering and identifying duplicates</param>
+        /// <param name="csvReader">Service used to read and write CSV data</param>
+        /// <param name="databaseService">Service used to interact with the database (schema creation, insert, row count)</param>
+        /// <param name="logger">Logger for diagnostic and process information</param>
         public EtlService(IDataProcessor dataProcessor, ICsvReader csvReader, IDatabaseService databaseService, ILogger<EtlService> logger)
         {
             _dataProcessor = dataProcessor;
@@ -19,6 +26,13 @@ namespace CsvToSqlETL.Services.Implementations
             _logger = logger;
         }
 
+        /// <summary>
+        /// Executes the full ETL (Extract, Transform, Load) pipeline:
+        /// ensures the database schema exists, reads and processes records,
+        /// writes duplicates to a CSV file, inserts valid records into the database,
+        /// and returns statistics about the operation
+        /// </summary>
+        /// <returns>A task representing the asynchronous ETL operation, with the result containing the number of processed rows and duplicates</returns>
         public async Task<EtlResult> ProcessDataAsync()
         {
             _logger.LogInformation("Starting ETL process");

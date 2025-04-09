@@ -6,7 +6,6 @@ using DotNetEnv.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace CsvToSqlETL
 {
@@ -35,6 +34,10 @@ namespace CsvToSqlETL
             }
         }
 
+        /// <summary>
+        /// Configures all required services, including configuration loading, dependency injection, and logging.
+        /// </summary>
+        /// <returns>A configured ServiceProvider with all services registered</returns>
         private static ServiceProvider ConfigureServices()
         {
             if (File.Exists(".env"))
