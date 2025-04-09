@@ -1,6 +1,6 @@
 ﻿using DotNetEnv;
 
-namespace CsvToSqlETL
+namespace CsvToSqlETL.Config
 {
     public static class AppConfig
     {
